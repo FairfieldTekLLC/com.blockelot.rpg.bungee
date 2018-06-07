@@ -1,0 +1,4 @@
+name: com.blockelot.rpg.bungee
+main: com.blockelot.rpg.bungee.MainPlugin
+version: 1.0
+author: Vincent Gee
