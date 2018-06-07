@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package com.blockelot.rpg.RpgPlayer.RabbitMQ;
+
 import com.google.gson.Gson;
 import com.rabbitmq.client.*;
 import java.io.IOException;
@@ -16,12 +17,12 @@ import java.util.concurrent.TimeoutException;
  * @author geev
  */
 public class MqRpcClient implements AutoCloseable {
-
+    
     private Connection Connection;
     private Channel Channel;
     private final String Exchange;
     private final Gson gson = new Gson();
-
+    
     public MqRpcClient(String server, String exchange, BuiltinExchangeType type) throws IOException, TimeoutException {
         Exchange = exchange;
         //Create the Connection Factory
@@ -38,13 +39,19 @@ public class MqRpcClient implements AutoCloseable {
         Channel.exchangeDeclare(Exchange, type, true);
     }
     
-    public <T> T Call(String exchange, String queueName, Object payload, long timeoutSeconds, Class<T> clazz) throws IOException, InterruptedException, TimeoutException 
-    {
+    public <T> T Call(String exchange, String queueName, Object payload, long timeoutSeconds, Class<T> clazz) throws IOException, InterruptedException, TimeoutException {
         RabbitMessagePayload Sendpayload = new RabbitMessagePayload(payload);
-        RabbitMessagePayload response = call(exchange,queueName,Sendpayload,timeoutSeconds);
+        RabbitMessagePayload response = call(exchange, queueName, Sendpayload, timeoutSeconds);
         return clazz.cast(gson.fromJson(response.getData(), clazz));
     }
-    
+//      private RabbitMessagePayload call(String exchange, String queueName, RabbitMessagePayload rmp, int timeoutSeconds) throws IOException, InterruptedException, TimeoutException {
+//        String replyQueueName = queueName + "." + UUID.randomUUID().toString();
+//        RpcClient client = new RpcClient(Channel, exchange, queueName, replyQueueName, timeoutSeconds * 1000);
+//        String message = gson.toJson(rmp);
+//        String response = client.stringCall(message);
+//        RabbitMessagePayload payload = gson.fromJson(response, RabbitMessagePayload.class);
+//        return payload;
+//    }
 
     private RabbitMessagePayload call(String exchange, String queueName, RabbitMessagePayload rmp, long timeoutSeconds) throws IOException, InterruptedException, TimeoutException {
         //Really don't need this since we create a Queue for each call.
@@ -70,11 +77,13 @@ public class MqRpcClient implements AutoCloseable {
             //Non-Blocking, will return null if no message.
             GetResponse resp = Channel.basicGet(replyQueueName, false);
             if (resp == null) {
+
                 //Check timeout.
                 long now = System.currentTimeMillis();
                 if ((now - start) > (timeoutSeconds * 1000)) {
                     throw new TimeoutException("RPC Call took to long.");
                 }
+                Thread.sleep(500);
                 continue;
             }
             //Ack the message.
@@ -87,7 +96,7 @@ public class MqRpcClient implements AutoCloseable {
         
         return payload;
     }
-
+    
     @Override
     public void close() {
         try {
@@ -102,11 +111,11 @@ public class MqRpcClient implements AutoCloseable {
         try {
             if (Connection.isOpen()) {
                 Connection.close();
-
+                
             }
         } catch (IOException e) {
             System.out.print(e.getMessage());
-           System.out.print(Arrays.toString(e.getStackTrace()));
+            System.out.print(Arrays.toString(e.getStackTrace()));
         }
         Connection = null;
     }

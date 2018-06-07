@@ -32,6 +32,7 @@ public class MainPlugin extends Plugin {
         try {
             Exec = new CommandExecuter();
             MqListen = new MqRpcListener("BungeeQueue", "192.168.211.63", "Minecraft", "BungeeQueue", BuiltinExchangeType.DIRECT, Boolean.TRUE, Exec);
+            (new Thread(MqListen)).start();
             
         } catch (Exception e) {
             System.out.print("Exception: " + e.getMessage());

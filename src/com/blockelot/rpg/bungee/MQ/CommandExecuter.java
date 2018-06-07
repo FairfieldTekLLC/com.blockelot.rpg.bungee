@@ -25,6 +25,26 @@ public class CommandExecuter extends RabbitExecuter implements Runnable {
 
     @Override
     public RabbitMessagePayload Execute(RabbitMessagePayload payload) {
+        System.out.print("ExecuteCalled. (" + payload.getType()+")");
+        if (payload.getType().equalsIgnoreCase("PlayerWorldRequest")) {
+            PlayerWorldRequest req = gson.fromJson(payload.getData(), PlayerWorldRequest.class);
+            ProxiedPlayer player = MainPlugin.Players.get(java.util.UUID.fromString(req.getPlayerId()));
+
+            PlayerWorldResponse r = new PlayerWorldResponse();
+            r.setPlayerId(req.getPlayerId());
+            r.setWorldName("Lobby");
+
+            if (player != null) {
+                System.out.print("found player!");
+                System.out.print("Player on World: " + player.getServer().getInfo().getName());
+                r.setWorldName(player.getServer().getInfo().getName());
+            }
+            else
+            {
+                System.out.print("Cannot find player!");
+            }
+            return new RabbitMessagePayload(r);
+        }
         if (payload.getType().equalsIgnoreCase("PlayerMoveRequest")) {
             PlayerMoveRequest req = gson.fromJson(payload.getData(), PlayerMoveRequest.class);
             CommandQueue.add(req);

@@ -18,7 +18,8 @@ import com.rabbitmq.client.Envelope;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
-
+import com.rabbitmq.client.RpcServer;
+import com.rabbitmq.client.StringRpcServer;
 /**
  *
  * @author geev
@@ -69,6 +70,23 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
             Channel.basicQos(0, 20, false);
             Channel.queueBind(RpcQueue, Exchange, RpcQueue);
             System.out.println(" [x] Awaiting RPC requests");
+            
+            
+            
+//            StringRpcServer server = new StringRpcServer(Channel,RpcQueue){
+//                 @Override
+//                 public String handleStringCall(String request) {
+//                        System.out.println("Got request: " + request);
+//                        RabbitMessagePayload payload = gson.fromJson(request, RabbitMessagePayload.class);
+//                        RabbitMessagePayload returnLoad = Executer.Execute(payload);
+//                        return gson.toJson(returnLoad);
+//                        
+//                    }
+//            };
+//            server.mainloop();
+                    
+            
+            
             final Consumer Consumer;
             Consumer = new DefaultConsumer(Channel) {
                 @Override
@@ -77,6 +95,7 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
                             .correlationId(properties.getCorrelationId())
                             .build();
                     String response = "";
+                    System.out.print("Recieved Message!");
 
                     try {
                         String message = new String(body, "UTF-8");
@@ -94,7 +113,7 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
                         Channel.basicPublish(rExchange, rQueue, replyProps, response.getBytes("UTF-8"));
                         Channel.basicAck(envelope.getDeliveryTag(), false);
                         // RabbitMq consumer worker thread notifies the RPC server owner thread 
-                        synchronized (MqRpcListener.this) {
+                        synchronized (this) {
                             this.notify();
                         }
                     }
@@ -104,6 +123,7 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
             while (!Stop) {
                 synchronized (Consumer) {
                     try {
+                        System.out.print("Waiting for message....");
                         Consumer.wait();
                     } catch (InterruptedException e) {
                         System.out.print(e.getMessage());
@@ -117,6 +137,7 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
             System.out.print(e.getMessage());
             System.out.print(Arrays.toString(e.getStackTrace()));
         }
+        System.out.print("Exiting Run...");
     }
 
     @Override

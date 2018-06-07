@@ -3,9 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/NetBeans/com.blockelot.rpg.bungee/src/com/blockelot/rpg/bungee/MQ/ResponseOk.java</file>
+            <file>file:/C:/NetBeans/com.blockelot.rpg.bungee/src/com/blockelot/rpg/bungee/MQ/PlayerMoveRequest.java</file>
             <file>file:/C:/NetBeans/com.blockelot.rpg.bungee/src/com/blockelot/rpg/bungee/MQ/CommandExecuter.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg.bungee/src/com/blockelot/rpg/RpgPlayer/RabbitMQ/MqRpcListener.java</file>
             <file>file:/C:/NetBeans/com.blockelot.rpg.bungee/src/com/blockelot/rpg/bungee/MainPlugin.java</file>
+            <file>file:/C:/NetBeans/com.blockelot.rpg.bungee/src/com/blockelot/rpg/bungee/MQ/PlayerWorldResponse.java</file>
         </group>
     </open-files>
 </project-private>
